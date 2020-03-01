@@ -1,0 +1,23 @@
+{
+  "name": "accordion",
+  "version": "0.1.0",
+  "description": "yet another simple accordion",
+  "main": "./dist/main.js",
+  "typings": "./dist/main.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/gorimori/accordion.git"
+  },
+  "keywords": [
+    "accordion"
+  ],
+  "author": "gorimori",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/gorimori/accordion/issues"
+  },
+  "homepage": "https://github.com/gorimori/accordion#readme",
+  "devDependencies": {
+    "typescript": "^3.8.3"
+  }
+}
