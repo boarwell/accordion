@@ -52,10 +52,12 @@ const createOnClickHandler = (
       await hook?.beforeClose?.();
       await close();
       await hook?.afterClose?.();
+      state = { name: 'closed' };
     } else {
       await hook?.beforeOpen?.();
       await open();
       await hook?.afterOpen?.();
+      state = { name: 'open' };
     }
     isBusy = false;
   };
