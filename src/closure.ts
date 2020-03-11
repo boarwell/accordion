@@ -1,4 +1,18 @@
-const initAccordion = (container: HTMLElement) => {
+type Callback = () => Promise<unknown>;
+
+interface OpenCloseControls {
+  open: Callback;
+  close: Callback;
+}
+
+interface OpenCloseHooks {
+  beforeClose?: Callback;
+  afterClose?: Callback;
+  beforeOpen?: Callback;
+  afterOpen?: Callback;
+}
+
+const initAccordion = (container: HTMLElement): OpenCloseControls => {
   const createTransitionPromise = () => {
     return new Promise(res => {
       container.addEventListener('transitionend', res, { once: true });
@@ -25,22 +39,13 @@ const initAccordion = (container: HTMLElement) => {
   return { open, close };
 };
 
-type Callback = () => Promise<unknown>;
-
-// TODO: container ではなく open(), close()を外から渡したら
-// ドロップダウンでもアコーディオンでもタブでもなんでもいけそうな気がする
 const createOnClickHandler = (
-  container: HTMLElement,
-  hook?: {
-    beforeClose?: Callback;
-    afterClose?: Callback;
-    beforeOpen?: Callback;
-    afterOpen?: Callback;
-  }
+  controls: OpenCloseControls,
+  hook?: OpenCloseHooks
 ) => {
   let state: { name: 'open' } | { name: 'closed' } = { name: 'closed' };
   let isBusy = false;
-  const { open, close } = initAccordion(container as HTMLElement);
+  const { open, close } = controls;
 
   const onClick = async () => {
     if (isBusy) {
@@ -68,8 +73,6 @@ const createOnClickHandler = (
 const main = () => {
   const trigger = document.querySelector('.js-trigger');
   const container = document.querySelector('.js-container')!;
-  trigger?.addEventListener(
-    'click',
-    createOnClickHandler(container as HTMLElement)
-  );
+  const accordionControls = initAccordion(container as HTMLElement);
+  trigger?.addEventListener('click', createOnClickHandler(accordionControls));
 };
