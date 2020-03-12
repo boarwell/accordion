@@ -1,5 +1,5 @@
-import type { OpenCloseControls, OpenCloseHooks } from './types';
-import { createTransitionPromiseOf, initOutOfAreaClickHandler } from './util';
+import type { OpenCloseControls, OpenCloseHooks } from '../types';
+import { createTransitionPromiseOf, initOutOfAreaClickHandler } from '../util';
 
 const createAccordionOpen = (container: HTMLElement) => async () => {
   const transition = createTransitionPromiseOf(container);
