@@ -1,22 +1,5 @@
-type Callback = () => Promise<unknown>;
-
-interface OpenCloseControls {
-  open: Callback;
-  close: Callback;
-}
-
-interface OpenCloseHooks {
-  beforeClose?: Callback;
-  afterClose?: Callback;
-  beforeOpen?: Callback;
-  afterOpen?: Callback;
-}
-
-const createTransitionPromiseOf = (container: HTMLElement) => {
-  return new Promise(res => {
-    container.addEventListener('transitionend', res, { once: true });
-  });
-};
+import type { OpenCloseControls, OpenCloseHooks } from './types';
+import { createTransitionPromiseOf, initOutOfAreaClickHandler } from './util';
 
 const createAccordionOpen = (container: HTMLElement) => async () => {
   const transition = createTransitionPromiseOf(container);
@@ -73,38 +56,17 @@ const createOnClickHandler = (
   return onClick;
 };
 
-const initOutOfAreaClickHandler = (
-  safeAreas: HTMLElement[],
-  close: Callback
-) => {
-  const onClick = async (e: Event) => {
-    const clickOnSafeArea = safeAreas.some(safeArea =>
-      safeArea.contains(e.target as HTMLElement)
-    );
-
-    if (clickOnSafeArea) {
-      return;
-    }
-    document.removeEventListener('click', onClick);
-    await close();
-  };
-
-  document.addEventListener('click', onClick);
-};
-
-const main = () => {
+export const main = () => {
   const trigger = document.querySelector('.js-trigger') as HTMLElement;
   const container = document.querySelector('.js-container')! as HTMLElement;
   const accordionControls = initAccordion(container);
+  const hook: OpenCloseHooks = {
+    afterOpen: async () => {
+      initOutOfAreaClickHandler([trigger, container], accordionControls.close);
+    }
+  };
   trigger?.addEventListener(
     'click',
-    createOnClickHandler(accordionControls, {
-      afterOpen: async () => {
-        initOutOfAreaClickHandler(
-          [trigger, container],
-          accordionControls.close
-        );
-      }
-    })
+    createOnClickHandler(accordionControls, hook)
   );
 };
