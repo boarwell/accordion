@@ -12,38 +12,41 @@ interface OpenCloseHooks {
   afterOpen?: Callback;
 }
 
+const createTransitionPromiseOf = (container: HTMLElement) => {
+  return new Promise(res => {
+    container.addEventListener('transitionend', res, { once: true });
+  });
+};
+
+const createAccordionOpen = (container: HTMLElement) => async () => {
+  const transition = createTransitionPromiseOf(container);
+  container.style.height = `${container.scrollHeight}px`;
+  await transition;
+  container.style.height = 'auto';
+  container.removeAttribute('aria-hidden');
+};
+
+const createAccordionClose = (container: HTMLElement) => async () => {
+  const transition = createTransitionPromiseOf(container);
+  container.style.height = `${container.scrollHeight}px`;
+  await new Promise(res => setTimeout(res, 50));
+  container.style.height = '0px';
+  await transition;
+  container.setAttribute('aria-hidden', 'true');
+};
+
 const initAccordion = (container: HTMLElement): OpenCloseControls => {
-  const createTransitionPromise = () => {
-    return new Promise(res => {
-      container.addEventListener('transitionend', res, { once: true });
-    });
+  return {
+    open: createAccordionOpen(container),
+    close: createAccordionClose(container)
   };
-
-  const open = async () => {
-    const transition = createTransitionPromise();
-    container.style.height = `${container.scrollHeight}px`;
-    await transition;
-    container.style.height = 'auto';
-    container.removeAttribute('aria-hidden');
-  };
-
-  const close = async () => {
-    const transition = createTransitionPromise();
-    container.style.height = `${container.scrollHeight}px`;
-    await new Promise(res => setTimeout(res, 50));
-    container.style.height = '0px';
-    await transition;
-    container.setAttribute('aria-hidden', 'true');
-  };
-
-  return { open, close };
 };
 
 const createOnClickHandler = (
   controls: OpenCloseControls,
   hook?: OpenCloseHooks
 ) => {
-  let state: { name: 'open' } | { name: 'closed' } = { name: 'closed' };
+  let state: 'open' | 'closed' = 'closed';
   let isBusy = false;
   const { open, close } = controls;
 
@@ -53,16 +56,16 @@ const createOnClickHandler = (
     }
 
     isBusy = true;
-    if (state.name === 'open') {
+    if (state === 'open') {
       await hook?.beforeClose?.();
       await close();
       await hook?.afterClose?.();
-      state = { name: 'closed' };
+      state = 'closed';
     } else {
       await hook?.beforeOpen?.();
       await open();
       await hook?.afterOpen?.();
-      state = { name: 'open' };
+      state = 'open';
     }
     isBusy = false;
   };
@@ -70,9 +73,38 @@ const createOnClickHandler = (
   return onClick;
 };
 
+const initOutOfAreaClickHandler = (
+  safeAreas: HTMLElement[],
+  close: Callback
+) => {
+  const onClick = async (e: Event) => {
+    const clickOnSafeArea = safeAreas.some(safeArea =>
+      safeArea.contains(e.target as HTMLElement)
+    );
+
+    if (clickOnSafeArea) {
+      return;
+    }
+    document.removeEventListener('click', onClick);
+    await close();
+  };
+
+  document.addEventListener('click', onClick);
+};
+
 const main = () => {
-  const trigger = document.querySelector('.js-trigger');
-  const container = document.querySelector('.js-container')!;
-  const accordionControls = initAccordion(container as HTMLElement);
-  trigger?.addEventListener('click', createOnClickHandler(accordionControls));
+  const trigger = document.querySelector('.js-trigger') as HTMLElement;
+  const container = document.querySelector('.js-container')! as HTMLElement;
+  const accordionControls = initAccordion(container);
+  trigger?.addEventListener(
+    'click',
+    createOnClickHandler(accordionControls, {
+      afterOpen: async () => {
+        initOutOfAreaClickHandler(
+          [trigger, container],
+          accordionControls.close
+        );
+      }
+    })
+  );
 };
