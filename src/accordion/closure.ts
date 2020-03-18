@@ -18,7 +18,7 @@ const createAccordionClose = (container: HTMLElement) => async () => {
   container.setAttribute('aria-hidden', 'true');
 };
 
-const initAccordion = (container: HTMLElement): OpenCloseControls => {
+export const initAccordion = (container: HTMLElement): OpenCloseControls => {
   return {
     open: createAccordionOpen(container),
     close: createAccordionClose(container)
@@ -56,7 +56,7 @@ const createOnClickHandler = (
   return onClick;
 };
 
-export const main = () => {
+const main = () => {
   const trigger = document.querySelector('.js-trigger') as HTMLElement;
   const container = document.querySelector('.js-container')! as HTMLElement;
   const accordionControls = initAccordion(container);
