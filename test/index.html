@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <style>
+      .container {
+        height: 0;
+        transition: height 0.35s ease-in-out;
+        overflow: hidden;
+      }
+    </style>
+
+    <script type="module">
+      import { init } from "/dist/accordion/class.js";
+      init();
+    </script>
+  </head>
+  <body>
+    <button type="button" data-accordion-trigger="test">DD Trigger</button>
+
+    <div class="container" data-accordion-container="test">
+      Container Text
+    </div>
+  </body>
+</html>

@@ -21,7 +21,7 @@ HTML
 JavaScript
 
 ```javascript
-import { init } from '@gorimori/accordion';
+import { init } from "@gorimori/accordion";
 init();
 ```
 
@@ -40,4 +40,11 @@ init();
 >
   container
 </div>
+```
+
+## テスト
+
+```sh
+$ hs ./
+# http://localhost:8080/test/
 ```
