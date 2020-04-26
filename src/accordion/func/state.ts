@@ -1,6 +1,20 @@
+/** @link https://qiita.com/suin/items/35c3953254255d24a193 */
+declare const _opaqueProperty: unique symbol;
+
 export type State = {
   isOpen: boolean;
   isBusy: boolean;
+  [_opaqueProperty]: never;
+};
+
+export const createNewContext = (
+  initialState?: Omit<State, typeof _opaqueProperty | "isBusy">
+): State => {
+  return {
+    isOpen: false,
+    isBusy: false,
+    ...initialState,
+  } as State;
 };
 
 // TODO: 戻りはResultみたいな型がよかったけどとりあえず
