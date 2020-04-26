@@ -59,6 +59,7 @@ const open_ = (context: State) => async (data: T): Promise<void> => {
   }
 
   if (context.isOpen) {
+    free(context);
     return;
   }
 
@@ -75,6 +76,7 @@ const close_ = (context: State) => async (data: T): Promise<void> => {
   }
 
   if (!context.isOpen) {
+    free(context);
     return;
   }
 
