@@ -26,6 +26,16 @@ const setZeroHeight = async (data: T): Promise<void> => {
   await promise;
 };
 
+const openCore = async (data: T): Promise<void> => {
+  await setRealHeight(data);
+  await setAutoHeight(data);
+};
+
+const closeCore = async (data: T): Promise<void> => {
+  await setRealHeight(data);
+  await setZeroHeight(data);
+};
+
 type State = {
   isOpen: boolean;
   isBusy: boolean;
@@ -63,8 +73,7 @@ const open_ = (context: State) => async (data: T): Promise<void> => {
     return;
   }
 
-  await setRealHeight(data);
-  await setAutoHeight(data);
+  await openCore(data);
   context.isOpen = true;
   free(context);
 };
@@ -80,8 +89,7 @@ const close_ = (context: State) => async (data: T): Promise<void> => {
     return;
   }
 
-  await setRealHeight(data);
-  await setZeroHeight(data);
+  await closeCore(data);
   context.isOpen = false;
   free(context);
 };
