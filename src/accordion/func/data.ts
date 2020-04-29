@@ -17,6 +17,7 @@ export const createNewData = (dom: HTMLElement): T => {
   };
 };
 
+// TODO: prefers-reduced-motionが設定されていたらすぐにresolveする
 const waitTransition = async (data: T): Promise<unknown> => {
   const transition = new Promise((res: () => void) => {
     data.dom.addEventListener("transitionend", res, { once: true });
