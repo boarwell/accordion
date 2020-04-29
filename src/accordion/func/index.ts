@@ -1,5 +1,5 @@
 import type { T } from "./data.js";
-import { openCore, closeCore } from "./data.js";
+import { openCore, closeCore, createNewData } from "./data.js";
 
 import type { State } from "./state.js";
 import { lock, free, update, createNewContext } from "./state.js";
@@ -79,7 +79,7 @@ export const init = () => {
     }
     const isOpen = container.hasAttribute("data-accordion-open");
     const context = createNewContext({ isOpen });
-    const data: T = { dom: container as HTMLElement };
+    const data = createNewData(container as HTMLElement);
     trigger.addEventListener("click", () => toggle(context)(data));
   }
 };

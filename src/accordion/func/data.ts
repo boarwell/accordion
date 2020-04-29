@@ -1,13 +1,32 @@
 /** データ型 */
 export type T = Readonly<{
   dom: HTMLElement;
+  transitionDurationMS: number;
 }>;
 
-const waitTransition = async (data: T): Promise<void> => {
-  // TODO: domがtransitionプロパティを持っていないときの処理
-  return new Promise((res: () => void) => {
+export const createNewData = (dom: HTMLElement): T => {
+  const computedStyle = window.getComputedStyle(dom);
+  const transitionDurationMS =
+    parseFloat(computedStyle.transitionDuration) * 1000;
+
+  return {
+    dom,
+    transitionDurationMS: isNaN(transitionDurationMS)
+      ? 0
+      : transitionDurationMS,
+  };
+};
+
+const waitTransition = async (data: T): Promise<unknown> => {
+  const transition = new Promise((res: () => void) => {
     data.dom.addEventListener("transitionend", res, { once: true });
   });
+
+  const timeout = new Promise((res) =>
+    setTimeout(res, data.transitionDurationMS)
+  );
+
+  return Promise.race([transition, timeout]);
 };
 
 const setRealHeight = async (data: T): Promise<void> => {
