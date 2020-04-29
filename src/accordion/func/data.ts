@@ -11,9 +11,7 @@ const waitTransition = async (data: T): Promise<void> => {
 };
 
 const setRealHeight = async (data: T): Promise<void> => {
-  const promise = waitTransition(data);
   data.dom.style.height = `${data.dom.scrollHeight}px`;
-  await promise;
 };
 
 const setAutoHeight = async (data: T): Promise<void> => {
@@ -21,17 +19,21 @@ const setAutoHeight = async (data: T): Promise<void> => {
 };
 
 const setZeroHeight = async (data: T): Promise<void> => {
-  const promise = waitTransition(data);
   data.dom.style.height = "0px";
-  await promise;
 };
 
 export const openCore = async (data: T): Promise<void> => {
+  const transition = waitTransition(data);
   await setRealHeight(data);
+  await transition;
   await setAutoHeight(data);
 };
 
 export const closeCore = async (data: T): Promise<void> => {
   await setRealHeight(data);
+  // autoから実数値になるのを少し待つ必要がある
+  await new Promise((res) => setTimeout(res, 50));
+  const transition = waitTransition(data);
   await setZeroHeight(data);
+  await transition;
 };
